@@ -1,8 +1,8 @@
 [package]
 name = "agrimboa-offline"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "Assistant agricole camerounais fonctionnant hors ligne"
+authors = ["AgriMboa"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -31,4 +31,3 @@ tauri-plugin-sql = { version = "2", features = ["sqlite"] }
 thiserror = "2.0.20"
 uuid = { version = "1.24.1", features = ["v4", "serde"] }
 chrono = { version = "0.4.45", features = ["serde"] }
-

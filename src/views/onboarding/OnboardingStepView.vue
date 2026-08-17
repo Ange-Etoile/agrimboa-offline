@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
 import diagnosisFarmer from "@/assets/images/onboarding/diagnosis-farmer.png";
@@ -12,6 +13,7 @@ import { onboardingSteps } from "@/features/onboarding/data/onboardingSteps";
 
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n();
 
 const currentStep = computed(() => {
   const value = Number(route.params.step);
@@ -23,12 +25,48 @@ const currentStep = computed(() => {
   return value;
 });
 
-const step = computed(() => {
+const originalStep = computed(() => {
   return onboardingSteps[currentStep.value - 1];
 });
 
+const featureTranslationKeys = [
+  [
+    "onboarding.step1.features.crop",
+    "onboarding.step1.features.symptoms",
+    "onboarding.step1.features.questions",
+  ],
+  [
+    "onboarding.step2.features.reliable",
+    "onboarding.step2.features.explanations",
+    "onboarding.step2.features.sources",
+  ],
+  [
+    "onboarding.step3.features.noConnection",
+    "onboarding.step3.features.consultations",
+    "onboarding.step3.features.available",
+  ],
+] as const;
+
+const step = computed(() => {
+  const stepNumber = currentStep.value;
+  const translationPrefix = `onboarding.step${stepNumber}`;
+  const translationKeys =
+    featureTranslationKeys[stepNumber - 1];
+
+  return {
+    eyebrow: t("onboarding.eyebrow"),
+    title: t(`${translationPrefix}.title`),
+    description: t(`${translationPrefix}.description`),
+
+    items: originalStep.value.items.map((item, index) => ({
+      icon: item.icon,
+      label: t(translationKeys[index]),
+    })),
+  };
+});
+
 const currentImage = computed(() => {
-  return step.value.image === "diagnosis"
+  return originalStep.value.image === "diagnosis"
     ? diagnosisFarmer
     : guidesFarmer;
 });
@@ -43,38 +81,44 @@ const imagePosition = computed(() => {
 
 const primaryButtonLabel = computed(() => {
   return currentStep.value === 3
-    ? "Commencer"
-    : "Suivant";
+    ? t("common.start")
+    : t("common.next");
 });
 
 const secondaryButtonLabel = computed(() => {
   return currentStep.value === 1
-    ? "Passer"
-    : "Retour";
+    ? t("common.skip")
+    : t("common.back");
 });
 
 const offlineLabel = computed(() => {
   return currentStep.value === 3
-    ? "Prêt à fonctionner hors ligne"
-    : "Fonctionne sans Internet";
+    ? t("offline.readyOffline")
+    : t("offline.worksOffline");
 });
 
-function nextStep() {
+async function nextStep(): Promise<void> {
   if (currentStep.value < 3) {
-    router.push(`/onboarding/${currentStep.value + 1}`);
+    await router.push(
+      `/onboarding/${currentStep.value + 1}`,
+    );
+
     return;
   }
 
-  router.push("/preparation");
+  await router.push("/preparation");
 }
 
-function previousStep() {
+async function previousStep(): Promise<void> {
   if (currentStep.value > 1) {
-    router.push(`/onboarding/${currentStep.value - 1}`);
+    await router.push(
+      `/onboarding/${currentStep.value - 1}`,
+    );
+
     return;
   }
 
-  router.push("/language");
+  await router.push("/language");
 }
 </script>
 
@@ -110,7 +154,7 @@ function previousStep() {
 
       <!-- Liste des avantages -->
       <FeatureList
-        :items="[...step.items]"
+        :items="step.items"
         class="mt-7 sm:mt-8 lg:mt-5 xl:mt-6"
       />
 
