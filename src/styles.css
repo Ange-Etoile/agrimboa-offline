@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+@import "@fontsource-variable/manrope";
+@import "@fontsource-variable/plus-jakarta-sans";
+
+@theme {
+  --font-sans: "Manrope Variable", sans-serif;
+  --font-display: "Plus Jakarta Sans Variable", sans-serif;
+
+  --color-brand-50: #f0fdf4;
+  --color-brand-100: #dcfce7;
+  --color-brand-200: #bbf7d0;
+  --color-brand-300: #86efac;
+  --color-brand-400: #4ade80;
+  --color-brand-500: #22c55e;
+  --color-brand-600: #16a34a;
+  --color-brand-700: #15803d;
+  --color-brand-800: #166534;
+  --color-brand-900: #14532d;
+  --color-brand-950: #052e16;
+
+  --color-earth-50: #faf8f3;
+  --color-earth-100: #f3eee3;
+  --color-earth-200: #e5dac6;
+  --color-earth-300: #d3bea1;
+  --color-earth-400: #bd9d77;
+  --color-earth-500: #aa8159;
+  --color-earth-600: #956946;
+  --color-earth-700: #79533b;
+  --color-earth-800: #654536;
+  --color-earth-900: #573c31;
+  --color-earth-950: #311f19;
+
+  --color-sun-50: #fffbea;
+  --color-sun-100: #fff3c5;
+  --color-sun-200: #ffe787;
+  --color-sun-300: #ffd447;
+  --color-sun-400: #ffbf1e;
+  --color-sun-500: #f99a07;
+  --color-sun-600: #dd7102;
+  --color-sun-700: #b74d06;
+  --color-sun-800: #943b0c;
+  --color-sun-900: #7a310d;
+  --color-sun-950: #461802;
+
+  /* Couleurs sémantiques AgriMboa */
+  --color-primary: #087a32;
+  --color-primary-hover: #066b2b;
+  --color-primary-soft: #f1f7e8;
+  --color-primary-subtle: #f7fbf1;
+
+  --color-heading: #07180f;
+  --color-body: #122037;
+  --color-muted: #59647a;
+  --color-muted-soft: #667087;
+
+  --color-surface: #fbfcfa;
+  --color-surface-soft: #f2f7e9;
+  --color-surface-illustration: #edf5d8;
+
+  --color-line: #dedfdd;
+  --color-line-strong: #d8d9d7;
+
+  --color-disabled: #e7e7e7;
+  --color-disabled-text: #999999;
+
+  --radius-card: 1.5rem;
+  --shadow-card: 0 18px 45px rgb(24 55 36 / 8%);
+}
+
+:root {
+  font-family: "Manrope Variable", sans-serif;
+  color: #17231b;
+  background: #f7faf7;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  background: #f7faf7;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: #f7faf7;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+#app {
+  min-height: 100vh;
+}
+html,
+body,
+#app {
+  width: 100%;
+  min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+  background: var(--color-surface);
+}
+
+/* Masquer visuellement les barres sans désactiver le scroll mobile */
+* {
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+@media (min-width: 1024px) {
+  html,
+  body,
+  #app {
+    height: 100%;
+    overflow: hidden;
+  }
+}
