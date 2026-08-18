@@ -2,7 +2,7 @@ import {
   createRouter,
   createWebHistory,
 } from "vue-router";
-
+import HomeView from "@/views/HomeView.vue";
 const router = createRouter({
   history: createWebHistory(),
 
@@ -34,6 +34,17 @@ const router = createRouter({
         import(
           "@/views/onboarding/PreparationView.vue"
         ),
+    },
+    {
+      path: "/home",
+      name: "home",
+      component: HomeView,
+    },
+    {
+      path: "/diagnosis/:step?",
+      name: "diagnosis",
+      component: () =>
+        import("@/views/DiagnosisView.vue"),
     },
   ],
 
