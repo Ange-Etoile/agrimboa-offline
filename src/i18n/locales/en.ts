@@ -403,4 +403,33 @@ observations: {
       },
     },
   },
+  diagnosisResult: {
+  common: {
+    back: "Back",
+  },
+
+  analysis: {
+    eyebrow: "LOCAL ANALYSIS IN PROGRESS",
+    title: "We are analysing your observations",
+    subtitle:
+      "The assistant compares your answers with the agricultural knowledge available on your device.",
+    progress: "Analysis",
+    stage1: "Observations saved",
+    stage1Detail:
+      "Your answers have been prepared for analysis.",
+    stage2: "Searching for probable causes",
+    stage2Detail:
+      "Comparison with known agricultural symptoms.",
+    stage3: "Preparing recommendations",
+    summary: "Observation summary",
+    crop: "Crop",
+    parts: "Affected parts",
+    symptoms: "Symptoms",
+    notSpecified: "Not specified",
+    local: "Local and private analysis",
+    localDetail:
+      "Your observations remain stored on your device.",
+    cancel: "Cancel analysis",
+  },
+},
 } as const;

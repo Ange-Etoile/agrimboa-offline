@@ -399,4 +399,33 @@ observations: {
       },
     },
   },
+  diagnosisResult: {
+  common: {
+    back: "Retour",
+  },
+
+  analysis: {
+    eyebrow: "ANALYSE LOCALE EN COURS",
+    title: "Nous analysons vos observations",
+    subtitle:
+      "L’assistant compare vos réponses avec les connaissances agricoles disponibles sur votre appareil.",
+    progress: "Analyse",
+    stage1: "Observations enregistrées",
+    stage1Detail:
+      "Vos réponses ont été préparées pour l’analyse.",
+    stage2: "Recherche des causes probables",
+    stage2Detail:
+      "Comparaison avec les symptômes agricoles connus.",
+    stage3: "Préparation des recommandations",
+    summary: "Résumé de vos observations",
+    crop: "Culture",
+    parts: "Parties touchées",
+    symptoms: "Symptômes",
+    notSpecified: "Non précisé",
+    local: "Analyse locale et confidentielle",
+    localDetail:
+      "Les observations restent enregistrées sur votre appareil.",
+    cancel: "Annuler l’analyse",
+  },
+},
 } as const;

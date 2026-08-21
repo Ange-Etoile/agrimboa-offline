@@ -4,20 +4,12 @@ export type DiagnosisStep =
   | "symptoms"
   | "yellowing"
   | "description"
-  | "extent";
+  | "dynamic";
 
-export type CropId =
-  | "maize"
-  | "cassava"
-  | "tomato"
-  | "plantain";
-
-export type DiagnosisAnswerType =
-  | "single_choice"
-  | "multiple_choice"
-  | "free_text"
-  | "number"
-  | "boolean";
+export type CropId = "maize" | "cassava" | "tomato" | "plantain";
+export type DiagnosisAnswerType = "single_choice" | "multiple_choice" | "free_text" | "number" | "boolean";
+export type DynamicAnswer = string | string[];
+export type AiProvider = "groq" | "local";
 
 export interface DiagnosisAnswers {
   crop: CropId | null;
@@ -26,14 +18,11 @@ export interface DiagnosisAnswers {
   yellowing: string | null;
   description: string;
   extent: string | null;
+  voiceTranscript: string;
+  followUpAnswers: Record<string, DynamicAnswer>;
 }
 
-export interface DiagnosisSprite {
-  sheet: string;
-  column: number;
-  row: number;
-}
-
+export interface DiagnosisSprite { sheet: string; column: number; row: number }
 export interface DiagnosisChoice {
   id: string;
   value?: string;
@@ -43,7 +32,6 @@ export interface DiagnosisChoice {
   sprite?: DiagnosisSprite;
   metadata?: Record<string, unknown>;
 }
-
 export interface DiagnosisCrop {
   id: CropId;
   translationKey: string;
@@ -53,15 +41,11 @@ export interface DiagnosisCrop {
   enabled: boolean;
   displayOrder: number;
 }
-
 export interface DiagnosisQuestion {
   id: string;
   cropId: CropId;
   code: string;
-  phase:
-    | "crop"
-    | "observations"
-    | "questions";
+  phase: "crop" | "observations" | "questions";
   answerType: DiagnosisAnswerType;
   titleKey: string;
   descriptionKey: string | null;
@@ -72,18 +56,18 @@ export interface DiagnosisQuestion {
   displayOrder: number;
   options: DiagnosisChoice[];
 }
-
+export interface DynamicQuestionDecision {
+  complete: boolean;
+  questionCode: string | null;
+  reason: string;
+  provider: AiProvider;
+  model: string;
+}
 export interface DiagnosisSession {
   id: string;
   cropId: CropId | null;
   locale: string;
-  status:
-    | "draft"
-    | "collecting"
-    | "analyzing"
-    | "completed"
-    | "failed"
-    | "cancelled";
+  status: "draft" | "collecting" | "analyzing" | "completed" | "failed" | "cancelled";
   currentQuestionCode: string | null;
   progress: number;
   startedAt: string;

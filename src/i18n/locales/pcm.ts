@@ -383,4 +383,33 @@ observations: {
       },
     },
   },
+  diagnosisResult: {
+  common: {
+    back: "Go back",
+  },
+
+  analysis: {
+    eyebrow: "LOCAL ANALYSIS DEY GO ON",
+    title: "We dey check wetin you observe",
+    subtitle:
+      "The assistant dey compare your answers with farming information wey dey inside your device.",
+    progress: "Analysis",
+    stage1: "We don save your observations",
+    stage1Detail:
+      "We don prepare your answers for analysis.",
+    stage2: "We dey find the possible causes",
+    stage2Detail:
+      "We dey compare the signs with farming problems wey we know.",
+    stage3: "We dey prepare advice for you",
+    summary: "Summary of wetin you observe",
+    crop: "Crop",
+    parts: "Parts wey problem touch",
+    symptoms: "Signs wey you see",
+    notSpecified: "You no specify am",
+    local: "Private analysis for your device",
+    localDetail:
+      "Your observations go remain inside your device.",
+    cancel: "Stop the analysis",
+  },
+},
 } as const;
