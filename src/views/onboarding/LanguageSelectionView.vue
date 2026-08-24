@@ -53,11 +53,11 @@ async function continueToOnboarding(): Promise<void> {
 
   await preferencesStore.changeLanguage(selectedLanguage.value);
 
-if (errorMessage.value) {
-  return;
-}
+  if (errorMessage.value) {
+    return;
+  }
 
-await router.push("/onboarding/1");
+  await router.push("/onboarding/1");
 }
 </script>
 
@@ -163,11 +163,7 @@ await router.push("/onboarding/1");
         :aria-busy="saving"
         @click="continueToOnboarding"
       >
-        {{
-          saving
-            ? t("common.loading")
-            : t("common.continue")
-        }}
+        {{ saving ? t("common.loading") : t("common.continue") }}
       </button>
 
       <!-- Note -->

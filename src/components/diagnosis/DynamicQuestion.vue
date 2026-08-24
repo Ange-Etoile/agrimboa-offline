@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { BrainCircuit, Check, Cloud, HardDrive, LoaderCircle, RotateCcw } from "lucide-vue-next";
-import type { AiProvider, DiagnosisQuestion, DynamicAnswer } from "@/features/diagnosis/types/diagnosis";
+import type { AiProvider, DiagnosisQuestion, DynamicAnswer, DynamicQuestionOrigin } from "@/features/diagnosis/types/diagnosis";
 
 const props = defineProps<{
   question: DiagnosisQuestion | null;
@@ -12,6 +12,7 @@ const props = defineProps<{
   complete: boolean;
   provider: AiProvider | null;
   model: string;
+  origin: DynamicQuestionOrigin | null;
 }>();
 const emit = defineEmits<{ "update:modelValue": [value: DynamicAnswer]; retry: [] }>();
 const selectedValues = computed<string[]>(() => Array.isArray(props.modelValue) ? props.modelValue : props.modelValue ? [props.modelValue] : []);
@@ -40,7 +41,7 @@ function updateText(event: Event): void { emit("update:modelValue", (event.targe
       <div class="flex flex-wrap items-center justify-between gap-2">
         <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold" :class="provider === 'groq' ? 'bg-sky-50 text-sky-700' : 'bg-primary-soft text-primary'">
           <Cloud v-if="provider === 'groq'" class="size-3.5" /><HardDrive v-else class="size-3.5" />
-          {{ provider === "groq" ? "IA en ligne - Groq" : "IA locale hors ligne" }}
+          {{ origin === "fallback" ? "Question de secours validée" : provider === "groq" ? "IA en ligne - Groq" : "IA locale hors ligne" }}
         </span>
         <span class="text-[9px] text-muted">{{ model }}</span>
       </div>

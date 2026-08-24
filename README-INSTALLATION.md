@@ -1,7 +1,3 @@
-# Mise à jour résultats AgriMboa
-
-Copiez le contenu de cette archive à la racine du projet en conservant l’arborescence. Les fichiers portant le même nom doivent être remplacés.
-
 ## Ce qui est ajouté
 
 - déblocage du bouton de fin de collecte ;
@@ -16,6 +12,13 @@ Copiez le contenu de cette archive à la racine du projet en conservant l’arbo
   plus tout le diagnostic par le secours générique ;
 - badge distinct pour Groq, Qwen local et le conseil local de secours ;
 - conseils de secours différents pour maïs, manioc, tomate et plantain.
+- génération libre de questions par l’expert IA selon la culture, les symptômes
+  et toutes les réponses précédentes ;
+- maximum trois questions intelligentes, avec arrêt anticipé dès que les
+  informations sont suffisantes ;
+- banque SQLite `005` utilisée uniquement si la question produite par l’IA est
+  invalide ou si les moteurs sont indisponibles ;
+- enregistrement des questions générées et validées dans `dynamic_questions`.
 
 ## Structure des résultats
 

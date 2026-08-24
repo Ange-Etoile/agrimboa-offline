@@ -50,8 +50,7 @@ const featureTranslationKeys = [
 const step = computed(() => {
   const stepNumber = currentStep.value;
   const translationPrefix = `onboarding.step${stepNumber}`;
-  const translationKeys =
-    featureTranslationKeys[stepNumber - 1];
+  const translationKeys = featureTranslationKeys[stepNumber - 1];
 
   return {
     eyebrow: t("onboarding.eyebrow"),
@@ -80,15 +79,11 @@ const imagePosition = computed(() => {
 });
 
 const primaryButtonLabel = computed(() => {
-  return currentStep.value === 3
-    ? t("common.start")
-    : t("common.next");
+  return currentStep.value === 3 ? t("common.start") : t("common.next");
 });
 
 const secondaryButtonLabel = computed(() => {
-  return currentStep.value === 1
-    ? t("common.skip")
-    : t("common.back");
+  return currentStep.value === 1 ? t("common.skip") : t("common.back");
 });
 
 const offlineLabel = computed(() => {
@@ -99,9 +94,7 @@ const offlineLabel = computed(() => {
 
 async function nextStep(): Promise<void> {
   if (currentStep.value < 3) {
-    await router.push(
-      `/onboarding/${currentStep.value + 1}`,
-    );
+    await router.push(`/onboarding/${currentStep.value + 1}`);
 
     return;
   }
@@ -111,9 +104,7 @@ async function nextStep(): Promise<void> {
 
 async function previousStep(): Promise<void> {
   if (currentStep.value > 1) {
-    await router.push(
-      `/onboarding/${currentStep.value - 1}`,
-    );
+    await router.push(`/onboarding/${currentStep.value - 1}`);
 
     return;
   }
@@ -153,10 +144,7 @@ async function previousStep(): Promise<void> {
       </header>
 
       <!-- Liste des avantages -->
-      <FeatureList
-        :items="step.items"
-        class="mt-7 sm:mt-8 lg:mt-5 xl:mt-6"
-      />
+      <FeatureList :items="step.items" class="mt-7 sm:mt-8 lg:mt-5 xl:mt-6" />
 
       <!-- Progression -->
       <StepProgress

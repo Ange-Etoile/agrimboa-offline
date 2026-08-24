@@ -9,9 +9,7 @@ import {
 } from "@/services/database.service";
 
 export type PreparationResourceId =
-  | "local-ai-model"
-  | "agricultural-guides"
-  | "local-storage";
+  "local-ai-model" | "agricultural-guides" | "local-storage";
 
 export interface PreparationResourceState {
   id: PreparationResourceId;
@@ -25,9 +23,7 @@ export interface PreparationResult {
   resources: PreparationResourceState[];
 }
 
-export type PreparationListener = (
-  result: PreparationResult,
-) => void;
+export type PreparationListener = (result: PreparationResult) => void;
 
 const resourceIds: PreparationResourceId[] = [
   "local-ai-model",
@@ -131,18 +127,12 @@ async function runCheck(
   check: () => Promise<void>,
   listener?: PreparationListener,
 ): Promise<void> {
-  const resource = findResource(
-    state,
-    resourceId,
-  );
+  const resource = findResource(state, resourceId);
 
   resource.status = "loading";
   resource.message = null;
 
-  await updateResourceStatus(
-    resourceId,
-    "loading",
-  );
+  await updateResourceStatus(resourceId, "loading");
 
   updateProgress(state);
   notify(listener, state);
@@ -153,18 +143,12 @@ async function runCheck(
     resource.status = "ready";
     resource.message = null;
 
-    await updateResourceStatus(
-      resourceId,
-      "ready",
-    );
+    await updateResourceStatus(resourceId, "ready");
   } catch (error: unknown) {
     resource.status = "error";
     resource.message = getErrorMessage(error);
 
-    await updateResourceStatus(
-      resourceId,
-      "error",
-    );
+    await updateResourceStatus(resourceId, "error");
   }
 
   updateProgress(state);
@@ -175,30 +159,21 @@ function findResource(
   state: PreparationResult,
   resourceId: PreparationResourceId,
 ): PreparationResourceState {
-  const resource = state.resources.find(
-    (item) => item.id === resourceId,
-  );
+  const resource = state.resources.find((item) => item.id === resourceId);
 
   if (!resource) {
-    throw new Error(
-      `Ressource de préparation inconnue : ${resourceId}`,
-    );
+    throw new Error(`Ressource de préparation inconnue : ${resourceId}`);
   }
 
   return resource;
 }
 
-function updateProgress(
-  state: PreparationResult,
-): void {
+function updateProgress(state: PreparationResult): void {
   const readyResources = state.resources.filter(
     (resource) => resource.status === "ready",
   ).length;
 
-  state.progress = Math.round(
-    (readyResources / state.resources.length) *
-      100,
-  );
+  state.progress = Math.round((readyResources / state.resources.length) * 100);
 }
 
 function notify(
@@ -208,23 +183,17 @@ function notify(
   listener?.(cloneResult(state));
 }
 
-function cloneResult(
-  state: PreparationResult,
-): PreparationResult {
+function cloneResult(state: PreparationResult): PreparationResult {
   return {
     completed: state.completed,
     progress: state.progress,
-    resources: state.resources.map(
-      (resource) => ({
-        ...resource,
-      }),
-    ),
+    resources: state.resources.map((resource) => ({
+      ...resource,
+    })),
   };
 }
 
-function getErrorMessage(
-  error: unknown,
-): string {
+function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     return error.message;
   }

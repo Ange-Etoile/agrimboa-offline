@@ -18,7 +18,9 @@ export async function transcribeVoice(
   language = "fr",
 ): Promise<VoiceTranscriptionResult> {
   if (!("__TAURI_INTERNALS__" in window)) {
-    throw new Error("La transcription hors ligne nécessite l’application Tauri.");
+    throw new Error(
+      "La transcription hors ligne nécessite l’application Tauri.",
+    );
   }
 
   const bytes = Array.from(new Uint8Array(await audio.arrayBuffer()));

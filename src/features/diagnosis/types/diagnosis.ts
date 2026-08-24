@@ -10,6 +10,7 @@ export type CropId = "maize" | "cassava" | "tomato" | "plantain";
 export type DiagnosisAnswerType = "single_choice" | "multiple_choice" | "free_text" | "number" | "boolean";
 export type DynamicAnswer = string | string[];
 export type AiProvider = "groq" | "local";
+export type DynamicQuestionOrigin = "ai" | "fallback";
 
 export interface DiagnosisAnswers {
   crop: CropId | null;
@@ -59,9 +60,11 @@ export interface DiagnosisQuestion {
 export interface DynamicQuestionDecision {
   complete: boolean;
   questionCode: string | null;
+  question: DiagnosisQuestion | null;
   reason: string;
   provider: AiProvider;
   model: string;
+  origin: DynamicQuestionOrigin;
 }
 export interface DiagnosisSession {
   id: string;

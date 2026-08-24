@@ -22,27 +22,19 @@ const { t } = useI18n();
 const quickActions = computed(() => [
   {
     title: t("home.actions.diagnosis.title"),
-    subtitle: t(
-      "home.actions.diagnosis.description",
-    ),
+    subtitle: t("home.actions.diagnosis.description"),
     icon: ScanSearch,
     to: "/diagnosis",
   },
   {
     title: t("home.actions.guides.title"),
-    subtitle: t(
-      "home.actions.guides.description",
-    ),
+    subtitle: t("home.actions.guides.description"),
     icon: BookOpen,
     to: "/guides",
   },
   {
-    title: t(
-      "home.actions.calculator.title",
-    ),
-    subtitle: t(
-      "home.actions.calculator.description",
-    ),
+    title: t("home.actions.calculator.title"),
+    subtitle: t("home.actions.calculator.description"),
     icon: Calculator,
     to: "/calculators",
   },
@@ -129,7 +121,7 @@ const enterTransition = {
               delay: 0.08,
             }"
           >
-            {{ t("home.hero.greeting") }} 
+            {{ t("home.hero.greeting") }}
           </motion.p>
 
           <motion.h1
@@ -169,49 +161,46 @@ const enterTransition = {
           </motion.p>
 
           <!-- Actions -->
-            <motion.div
+          <motion.div
             class="mt-auto grid min-w-0 gap-2 pt-4 sm:max-w-[500px] lg:mt-4 lg:grid-cols-[245px_195px] lg:pt-0"
             :initial="{
-                opacity: 0,
-                y: 12,
+              opacity: 0,
+              y: 12,
             }"
             :animate="{
-                opacity: 1,
-                y: 0,
+              opacity: 1,
+              y: 0,
             }"
             :transition="{
-                ...enterTransition,
-                delay: 0.23,
+              ...enterTransition,
+              delay: 0.23,
             }"
-            >
+          >
             <!-- Commencer une consultation -->
             <RouterLink
-                :to="{
+              :to="{
                 name: 'diagnosis',
                 params: {
-                    step: 'crop',
+                  step: 'crop',
                 },
-                }"
-                class="flex h-11 min-w-0 items-center justify-center gap-2 rounded-lg bg-primary px-3 text-[11px] font-bold text-white shadow-sm transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-200 sm:text-[12px] lg:h-[46px] lg:text-[13px]"
+              }"
+              class="flex h-11 min-w-0 items-center justify-center gap-2 rounded-lg bg-primary px-3 text-[11px] font-bold text-white shadow-sm transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-200 sm:text-[12px] lg:h-[46px] lg:text-[13px]"
             >
-                <span class="whitespace-nowrap">
+              <span class="whitespace-nowrap">
                 {{ t("home.hero.start") }}
-                </span>
+              </span>
 
-                <ArrowRight
-                class="size-4 shrink-0"
-                aria-hidden="true"
-                />
+              <ArrowRight class="size-4 shrink-0" aria-hidden="true" />
             </RouterLink>
 
             <!-- Revoir le fonctionnement de l’application -->
             <RouterLink
-                to="/onboarding/1"
-                class="hidden h-[46px] items-center justify-center rounded-lg border border-primary bg-white/65 px-3 text-[12px] font-semibold text-primary transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-100 lg:flex"
+              to="/onboarding/1"
+              class="hidden h-[46px] items-center justify-center rounded-lg border border-primary bg-white/65 px-3 text-[12px] font-semibold text-primary transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-100 lg:flex"
             >
-                {{ t("home.hero.howItWorks") }}
+              {{ t("home.hero.howItWorks") }}
             </RouterLink>
-            </motion.div>
+          </motion.div>
         </div>
       </motion.section>
 
@@ -241,9 +230,7 @@ const enterTransition = {
           {{ t("home.quickAccess") }}
         </h2>
 
-        <div
-          class="mt-2.5 grid grid-cols-3 gap-2 sm:gap-3 lg:gap-4"
-        >
+        <div class="mt-2.5 grid grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
           <RouterLink
             v-for="action in quickActions"
             :key="action.to"
@@ -261,9 +248,7 @@ const enterTransition = {
               />
             </span>
 
-            <span
-              class="mt-2 min-w-0 pr-2 lg:mt-0 lg:flex-1 lg:pr-0"
-            >
+            <span class="mt-2 min-w-0 pr-2 lg:mt-0 lg:flex-1 lg:pr-0">
               <strong
                 class="block text-[10px] font-bold leading-[1.25] text-heading sm:text-[11px] lg:text-[13px]"
               >
@@ -315,9 +300,7 @@ const enterTransition = {
             {{ t("home.crops.title") }}
           </h2>
 
-          <div
-            class="mt-2.5 grid grid-cols-3 gap-2 sm:gap-3"
-          >
+          <div class="mt-2.5 grid grid-cols-3 gap-2 sm:gap-3">
             <RouterLink
               v-for="crop in crops"
               :key="crop.id"
@@ -368,63 +351,34 @@ const enterTransition = {
             />
 
             <div class="min-w-0 flex-1">
-              <div
-                class="flex flex-wrap items-center justify-between gap-1.5"
-              >
-                <h3
-                  class="text-[14px] font-extrabold text-heading"
-                >
+              <div class="flex flex-wrap items-center justify-between gap-1.5">
+                <h3 class="text-[14px] font-extrabold text-heading">
                   {{ t("home.crops.maize") }}
                 </h3>
 
                 <span
                   class="rounded-md border border-sun-200 bg-sun-50 px-1.5 py-0.5 text-[8px] font-medium text-sun-700 sm:text-[9px]"
                 >
-                  {{
-                    t(
-                      "home.lastConsultation.confidence",
-                    )
-                  }}
+                  {{ t("home.lastConsultation.confidence") }}
                 </span>
               </div>
 
-              <p
-                class="mt-1 truncate text-[10px] text-muted sm:text-[11px]"
-              >
-                {{
-                  t(
-                    "home.lastConsultation.symptoms",
-                  )
-                }}
+              <p class="mt-1 truncate text-[10px] text-muted sm:text-[11px]">
+                {{ t("home.lastConsultation.symptoms") }}
               </p>
 
-              <div
-                class="mt-1.5 flex items-center justify-between gap-1"
-              >
-                <span
-                  class="truncate text-[9px] text-muted-soft"
-                >
-                  {{
-                    t(
-                      "home.lastConsultation.time",
-                    )
-                  }}
+              <div class="mt-1.5 flex items-center justify-between gap-1">
+                <span class="truncate text-[9px] text-muted-soft">
+                  {{ t("home.lastConsultation.time") }}
                 </span>
 
                 <RouterLink
                   to="/diagnosis/current"
                   class="flex shrink-0 items-center gap-0.5 text-[10px] font-bold text-primary sm:text-[11px]"
                 >
-                  {{
-                    t(
-                      "home.lastConsultation.resume",
-                    )
-                  }}
+                  {{ t("home.lastConsultation.resume") }}
 
-                  <ChevronRight
-                    class="size-4"
-                    aria-hidden="true"
-                  />
+                  <ChevronRight class="size-4" aria-hidden="true" />
                 </RouterLink>
               </div>
             </div>
@@ -456,15 +410,11 @@ const enterTransition = {
         />
 
         <div>
-          <p
-            class="hidden text-[11px] font-bold text-primary lg:block"
-          >
+          <p class="hidden text-[11px] font-bold text-primary lg:block">
             {{ t("offline.worksOffline") }}
           </p>
 
-          <p
-            class="text-[11px] text-muted lg:mt-0.5"
-          >
+          <p class="text-[11px] text-muted lg:mt-0.5">
             {{ t("offline.dataStaysOnDevice") }}
           </p>
         </div>

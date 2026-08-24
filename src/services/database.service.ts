@@ -1,11 +1,7 @@
 import { isTauri } from "@tauri-apps/api/core";
 import Database from "@tauri-apps/plugin-sql";
 
-export type ResourceStatus =
-  | "pending"
-  | "loading"
-  | "ready"
-  | "error";
+export type ResourceStatus = "pending" | "loading" | "ready" | "error";
 
 export interface AppResource {
   id: string;
@@ -63,9 +59,7 @@ export async function initializeDatabase(): Promise<void> {
 
   const database = await openDatabase();
 
-  await database.select<{ result: number }[]>(
-    "SELECT 1 AS result",
-  );
+  await database.select<{ result: number }[]>("SELECT 1 AS result");
 }
 
 export async function testLocalStorage(): Promise<void> {
@@ -87,9 +81,7 @@ export async function testLocalStorage(): Promise<void> {
     ["ready", "local-storage"],
   );
 
-  const rows = await database.select<
-    Array<{ status: ResourceStatus }>
-  >(
+  const rows = await database.select<Array<{ status: ResourceStatus }>>(
     `
       SELECT status
       FROM app_resources
@@ -100,9 +92,7 @@ export async function testLocalStorage(): Promise<void> {
   );
 
   if (rows[0]?.status !== "ready") {
-    throw new Error(
-      "La vérification du stockage local a échoué.",
-    );
+    throw new Error("La vérification du stockage local a échoué.");
   }
 }
 
@@ -113,9 +103,7 @@ export async function getGuideCount(): Promise<number> {
 
   const database = await openDatabase();
 
-  const rows = await database.select<
-    Array<{ total: number }>
-  >(
+  const rows = await database.select<Array<{ total: number }>>(
     `
       SELECT COUNT(*) AS total
       FROM agricultural_guides
@@ -126,9 +114,7 @@ export async function getGuideCount(): Promise<number> {
   return Number(rows[0]?.total ?? 0);
 }
 
-export async function getAppResources(): Promise<
-  AppResource[]
-> {
+export async function getAppResources(): Promise<AppResource[]> {
   if (!isNativeApplication()) {
     return getBrowserResources();
   }
@@ -204,9 +190,7 @@ export async function updateResourceStatus(
   );
 }
 
-function mapResourceRow(
-  row: AppResourceRow,
-): AppResource {
+function mapResourceRow(row: AppResourceRow): AppResource {
   return {
     id: row.id,
     resourceType: row.resource_type,
@@ -232,24 +216,18 @@ function testBrowserStorage(): void {
   localStorage.removeItem(testKey);
 
   if (savedValue !== testValue) {
-    throw new Error(
-      "Le stockage du navigateur est indisponible.",
-    );
+    throw new Error("Le stockage du navigateur est indisponible.");
   }
 }
 
 function getBrowserResources(): AppResource[] {
-  const savedValue = localStorage.getItem(
-    "agrimboa.development.resources",
-  );
+  const savedValue = localStorage.getItem("agrimboa.development.resources");
 
   if (savedValue) {
     try {
       return JSON.parse(savedValue) as AppResource[];
     } catch {
-      localStorage.removeItem(
-        "agrimboa.development.resources",
-      );
+      localStorage.removeItem("agrimboa.development.resources");
     }
   }
 
@@ -300,9 +278,7 @@ function updateBrowserResource(
   status: ResourceStatus,
 ): void {
   const resources = getBrowserResources();
-  const resource = resources.find(
-    (item) => item.id === resourceId,
-  );
+  const resource = resources.find((item) => item.id === resourceId);
 
   if (!resource) {
     return;

@@ -5,14 +5,75 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: "/", redirect: "/language" },
-    { path: "/language", name: "language", component: () => import("@/views/onboarding/LanguageSelectionView.vue") },
-    { path: "/onboarding/:step(1|2|3)", name: "onboarding-step", component: () => import("@/views/onboarding/OnboardingStepView.vue") },
-    { path: "/preparation", name: "preparation", component: () => import("@/views/onboarding/PreparationView.vue") },
+    {
+      path: "/language",
+      name: "language",
+      component: () => import("@/views/onboarding/LanguageSelectionView.vue"),
+    },
+    {
+      path: "/onboarding/:step(1|2|3)",
+      name: "onboarding-step",
+      component: () => import("@/views/onboarding/OnboardingStepView.vue"),
+    },
+    {
+      path: "/preparation",
+      name: "preparation",
+      component: () => import("@/views/onboarding/PreparationView.vue"),
+    },
     { path: "/home", name: "home", component: HomeView },
-    { path: "/diagnosis/analyzing", name: "diagnosis-analysis", component: () => import("@/views/DiagnosisAnalysisView.vue") },
-    { path: "/diagnosis/result/:section(overview|action|why|followup)?", name: "diagnosis-result", component: () => import("@/views/DiagnosisResultView.vue") },
-    { path: "/diagnosis/:step?", name: "diagnosis", component: () => import("@/views/DiagnosisView.vue") },
+    {
+      path: "/library",
+      name: "library",
+      component: () => import("@/views/AgriculturalLibraryView.vue"),
+    },
+    {
+      path: "/library/:slug",
+      name: "library-guide",
+      component: () => import("@/views/AgriculturalGuideView.vue"),
+    },
+    {
+      path: "/calculators",
+      name: "calculators",
+      component: () => import("@/views/AgriculturalCalculatorsView.vue"),
+    },
+    {
+      path: "/calculators/:step(harvest|budget|converter)",
+      name: "utility-calculator",
+      component: () => import("@/views/AgriculturalUtilityCalculatorView.vue"),
+    },
+    {
+      path: "/calculators/:step(surface|density|seeds|inputs|summary)",
+      name: "calculator",
+      component: () => import("@/views/AgriculturalCalculatorView.vue"),
+    },
+    {
+      path: "/history",
+      name: "history",
+      component: () => import("@/views/DiagnosisHistoryView.vue"),
+    },
+    {
+      path: "/diagnosis/analyzing",
+      name: "diagnosis-analysis",
+      component: () => import("@/views/DiagnosisAnalysisView.vue"),
+    },
+    {
+      path: "/diagnosis/result/:section(overview|action|why|followup)?",
+      name: "diagnosis-result",
+      component: () => import("@/views/DiagnosisResultView.vue"),
+    },
+    {
+      path: "/help",
+      name: "help",
+      component: () => import("@/views/HelpCenterView.vue"),
+    },
+    {
+      path: "/diagnosis/:step?",
+      name: "diagnosis",
+      component: () => import("@/views/DiagnosisView.vue"),
+    },
   ],
-  scrollBehavior() { return { top: 0 }; },
+  scrollBehavior() {
+    return { top: 0 };
+  },
 });
 export default router;

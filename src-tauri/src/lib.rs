@@ -111,6 +111,13 @@ async fn generate_diagnosis(
         .map_err(|local| format!("Groq indisponible ({online_error}). Moteur local indisponible ({local})."))
 }
 
+#[tauri::command]
+async fn generate_calculator_advice(
+    request: DiagnosisGenerationRequest,
+) -> Result<DynamicQuestionResponse, String> {
+    generate_diagnosis(request).await
+}
+
 async fn call_model(client: &reqwest::Client, url: &str, key: Option<&str>, model: &str, prompt: &str, max_tokens: u32, timeout: u64) -> Result<String, String> {
     let body = json!({ "model": model, "temperature": 0.15, "max_tokens": max_tokens, "response_format": {"type":"json_object"}, "messages": [
         {"role":"system","content":"Tu es un assistant agronomique prudent. Réponds uniquement avec un objet JSON valide, sans markdown."},
@@ -297,8 +304,8 @@ async fn call_groq(
 ) -> Result<String, String> {
     let body = json!({
         "model": GROQ_MODEL,
-        "temperature": 0.1,
-        "max_completion_tokens": 160,
+        "temperature": 0.3,
+        "max_completion_tokens": 360,
         "reasoning_effort": "none",
         "response_format": { "type": "json_object" },
         "messages": [
@@ -333,9 +340,6 @@ async fn call_groq(
     let content = extract_content(&payload)
         .ok_or_else(|| "réponse Groq vide".to_string())?;
 
-    validate_decision_content(&content)
-        .map_err(|error| format!("réponse Groq invalide : {error}"))?;
-
     Ok(content)
 }
 
@@ -345,8 +349,8 @@ async fn call_local(
 ) -> Result<String, String> {
     let body = json!({
         "model": LOCAL_MODEL,
-        "temperature": 0.1,
-        "max_tokens": 120,
+        "temperature": 0.35,
+        "max_tokens": 320,
         "response_format": { "type": "json_object" },
         "messages": [
             { "role": "system", "content": "Tu réponds uniquement avec un objet JSON valide et concis." },
@@ -384,38 +388,6 @@ fn extract_content(payload: &Value) -> Option<String> {
         .map(ToOwned::to_owned)
 }
 
-fn validate_decision_content(content: &str) -> Result<(), String> {
-    let cleaned = content
-        .trim()
-        .strip_prefix("```json")
-        .unwrap_or(content.trim())
-        .strip_suffix("```")
-        .unwrap_or(content.trim())
-        .trim();
-
-    let value: Value = serde_json::from_str(cleaned)
-        .map_err(|error| error.to_string())?;
-
-    let complete = value
-        .get("complete")
-        .and_then(Value::as_bool)
-        .ok_or_else(|| "champ complete manquant".to_string())?;
-
-    if value.get("reason").and_then(Value::as_str).is_none() {
-        return Err("champ reason manquant".to_string());
-    }
-
-    let question_code = value.get("questionCode");
-    if complete && !matches!(question_code, None | Some(Value::Null)) {
-        return Err("questionCode doit être null lorsque complete vaut true".to_string());
-    }
-    if !complete && question_code.and_then(Value::as_str).is_none() {
-        return Err("questionCode est requis lorsque complete vaut false".to_string());
-    }
-
-    Ok(())
-}
-
 fn database_migrations() -> Vec<Migration> {
     vec![
         Migration { version: 1, description: "create_initial_agrimboa_schema", sql: include_str!("../migrations/001_initial_schema.sql"), kind: MigrationKind::Up },
@@ -423,6 +395,9 @@ fn database_migrations() -> Vec<Migration> {
         Migration { version: 3, description: "create_diagnosis_engine", sql: include_str!("../migrations/003_diagnosis_engine.sql"), kind: MigrationKind::Up },
         Migration { version: 4, description: "seed_mvp_question_banks", sql: include_str!("../migrations/004_seed_mvp_question_banks.sql"), kind: MigrationKind::Up },
         Migration { version: 5, description: "seed_follow_up_questions", sql: include_str!("../migrations/005_seed_follow_up_questions.sql"), kind: MigrationKind::Up },
+        Migration { version: 6, description: "create_diagnosis_history", sql: include_str!("../migrations/006_diagnosis_history.sql"), kind: MigrationKind::Up },
+        Migration { version: 7, description: "create_agricultural_library", sql: include_str!("../migrations/007_agricultural_library.sql"), kind: MigrationKind::Up },
+        Migration { version: 8, description: "create_agricultural_calculators", sql: include_str!("../migrations/008_agricultural_calculators.sql"), kind: MigrationKind::Up },
     ]
 }
 
@@ -446,6 +421,7 @@ pub fn run() {
             greet,
             choose_dynamic_question,
             generate_diagnosis,
+            generate_calculator_advice,
             transcribe_voice
         ])
         .run(tauri::generate_context!())

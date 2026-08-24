@@ -11,13 +11,8 @@ const STORE_FILE_NAME = "agrimboa-settings.json";
 const STORE_KEY = "preferences";
 const LOCAL_STORAGE_KEY = "agrimboa.preferences";
 
-function normalizePreferences(
-  value: unknown,
-): AppPreferences {
-  if (
-    typeof value !== "object" ||
-    value === null
-  ) {
+function normalizePreferences(value: unknown): AppPreferences {
+  if (typeof value !== "object" || value === null) {
     return {
       ...DEFAULT_PREFERENCES,
     };
@@ -44,8 +39,7 @@ function normalizePreferences(
 
 function loadFromLocalStorage(): AppPreferences {
   try {
-    const savedValue =
-      localStorage.getItem(LOCAL_STORAGE_KEY);
+    const savedValue = localStorage.getItem(LOCAL_STORAGE_KEY);
 
     if (!savedValue) {
       return {
@@ -53,14 +47,9 @@ function loadFromLocalStorage(): AppPreferences {
       };
     }
 
-    return normalizePreferences(
-      JSON.parse(savedValue),
-    );
+    return normalizePreferences(JSON.parse(savedValue));
   } catch (error) {
-    console.error(
-      "Impossible de lire les préférences locales.",
-      error,
-    );
+    console.error("Impossible de lire les préférences locales.", error);
 
     return {
       ...DEFAULT_PREFERENCES,
@@ -68,41 +57,28 @@ function loadFromLocalStorage(): AppPreferences {
   }
 }
 
-function saveToLocalStorage(
-  preferences: AppPreferences,
-): void {
+function saveToLocalStorage(preferences: AppPreferences): void {
   try {
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY,
-      JSON.stringify(preferences),
-    );
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(preferences));
   } catch (error) {
-    console.error(
-      "Impossible d’enregistrer les préférences locales.",
-      error,
-    );
+    console.error("Impossible d’enregistrer les préférences locales.", error);
   }
 }
 
 async function loadFromTauriStore(): Promise<AppPreferences> {
-  const { load } =
-    await import("@tauri-apps/plugin-store");
+  const { load } = await import("@tauri-apps/plugin-store");
 
   const store = await load(STORE_FILE_NAME, {
     autoSave: false,
   });
 
-  const savedPreferences =
-    await store.get<unknown>(STORE_KEY);
+  const savedPreferences = await store.get<unknown>(STORE_KEY);
 
   return normalizePreferences(savedPreferences);
 }
 
-async function saveToTauriStore(
-  preferences: AppPreferences,
-): Promise<void> {
-  const { load } =
-    await import("@tauri-apps/plugin-store");
+async function saveToTauriStore(preferences: AppPreferences): Promise<void> {
+  const { load } = await import("@tauri-apps/plugin-store");
 
   const store = await load(STORE_FILE_NAME, {
     autoSave: false,
@@ -132,8 +108,7 @@ export async function loadPreferences(): Promise<AppPreferences> {
 export async function savePreferences(
   preferences: AppPreferences,
 ): Promise<void> {
-  const normalizedPreferences =
-    normalizePreferences(preferences);
+  const normalizedPreferences = normalizePreferences(preferences);
 
   /*
    * Une copie est également conservée dans localStorage.
@@ -160,8 +135,7 @@ export async function savePreferences(
 export async function saveLanguage(
   language: SupportedLocale,
 ): Promise<AppPreferences> {
-  const currentPreferences =
-    await loadPreferences();
+  const currentPreferences = await loadPreferences();
 
   const updatedPreferences: AppPreferences = {
     ...currentPreferences,

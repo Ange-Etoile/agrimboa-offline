@@ -27,9 +27,7 @@ let guideDatabasePromise: Promise<Database> | null = null;
 
 async function openGuideDatabase(): Promise<Database> {
   if (!guideDatabasePromise) {
-    guideDatabasePromise = Database.load(
-      "sqlite:agrimboa.db",
-    );
+    guideDatabasePromise = Database.load("sqlite:agrimboa.db");
   }
 
   return guideDatabasePromise;
@@ -46,9 +44,7 @@ export async function findRelevantGuides(
 
   const database = await openGuideDatabase();
 
-  const rows = await database.select<
-    AgriculturalGuideRow[]
-  >(
+  const rows = await database.select<AgriculturalGuideRow[]>(
     `
       SELECT
         id,
@@ -65,18 +61,12 @@ export async function findRelevantGuides(
   );
 
   const questionTokens = tokenize(question);
-  const normalizedCrop = crop
-    ? normalizeText(crop)
-    : null;
+  const normalizedCrop = crop ? normalizeText(crop) : null;
 
   return rows
     .map((row) => ({
       guide: mapGuide(row),
-      score: calculateScore(
-        row,
-        questionTokens,
-        normalizedCrop,
-      ),
+      score: calculateScore(row, questionTokens, normalizedCrop),
     }))
     .filter((result) => result.score > 0)
     .sort((first, second) => {
@@ -97,10 +87,7 @@ function calculateScore(
 
   let score = 0;
 
-  if (
-    crop &&
-    cropMatches(crop, guideCrop)
-  ) {
+  if (crop && cropMatches(crop, guideCrop)) {
     score += 20;
   }
 
@@ -121,10 +108,7 @@ function calculateScore(
   return score;
 }
 
-function cropMatches(
-  requestedCrop: string,
-  guideCrop: string,
-): boolean {
+function cropMatches(requestedCrop: string, guideCrop: string): boolean {
   const equivalents: Record<string, string[]> = {
     cassava: ["cassava", "manioc"],
     manioc: ["cassava", "manioc"],
@@ -132,8 +116,7 @@ function cropMatches(
     mais: ["maize", "mais"],
   };
 
-  const acceptedValues =
-    equivalents[requestedCrop] ?? [requestedCrop];
+  const acceptedValues = equivalents[requestedCrop] ?? [requestedCrop];
 
   return acceptedValues.includes(guideCrop);
 }
@@ -158,9 +141,7 @@ function normalizeText(value: string): string {
     .trim();
 }
 
-function mapGuide(
-  row: AgriculturalGuideRow,
-): AgriculturalGuide {
+function mapGuide(row: AgriculturalGuideRow): AgriculturalGuide {
   return {
     id: row.id,
     title: row.title,

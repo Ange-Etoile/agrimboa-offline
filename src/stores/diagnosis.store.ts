@@ -1,9 +1,10 @@
 import { defineStore } from "pinia";
 import { getQuestionsForCrop, isTauriApplication } from "@/services/diagnosis.service";
-import { chooseNextDiagnosisQuestion } from "@/services/local-ai.service";
-import type { AiProvider, CropId, DiagnosisAnswers, DiagnosisQuestion, DynamicAnswer } from "@/features/diagnosis/types/diagnosis";
+import { generateNextDiagnosisQuestion, saveGeneratedQuestion } from "@/services/local-ai.service";
+import type { AiProvider, CropId, DiagnosisAnswers, DiagnosisQuestion, DynamicAnswer, DynamicQuestionOrigin } from "@/features/diagnosis/types/diagnosis";
 
 const STORAGE_KEY = "agrimboa.diagnosis.draft";
+const MAX_DYNAMIC_QUESTIONS = 3;
 
 function emptyAnswers(): DiagnosisAnswers {
   return { crop: null, parts: [], symptoms: [], yellowing: null, description: "", extent: null, voiceTranscript: "", followUpAnswers: {} };
@@ -22,7 +23,10 @@ interface DiagnosisState {
   dynamicError: string | null;
   dynamicProvider: AiProvider | null;
   dynamicModel: string;
+  dynamicOrigin: DynamicQuestionOrigin | null;
   askedQuestionCodes: string[];
+  askedQuestionTitles: string[];
+  sessionId: string;
   collectionComplete: boolean;
 }
 
@@ -30,7 +34,8 @@ export const useDiagnosisStore = defineStore("diagnosis", {
   state: (): DiagnosisState => ({
     answers: emptyAnswers(), questions: [], questionsLoading: false, questionsError: null, hydrated: false,
     currentDynamicQuestion: null, currentDynamicAnswer: "", dynamicReason: "", dynamicLoading: false,
-    dynamicError: null, dynamicProvider: null, dynamicModel: "", askedQuestionCodes: [], collectionComplete: false,
+    dynamicError: null, dynamicProvider: null, dynamicModel: "", dynamicOrigin: null,
+    askedQuestionCodes: [], askedQuestionTitles: [], sessionId: "", collectionComplete: false,
   }),
   getters: {
     cropNameKey(state): string { return state.answers.crop ? `diagnosis.crop.${state.answers.crop}` : "diagnosis.crop.maize"; },
@@ -45,24 +50,26 @@ export const useDiagnosisStore = defineStore("diagnosis", {
       const storedValue = localStorage.getItem(STORAGE_KEY);
       if (storedValue) {
         try {
-          const parsed = JSON.parse(storedValue) as Partial<DiagnosisAnswers> & { askedQuestionCodes?: string[]; collectionComplete?: boolean };
+          const parsed = JSON.parse(storedValue) as Partial<DiagnosisAnswers> & { askedQuestionCodes?: string[]; askedQuestionTitles?: string[]; sessionId?: string; collectionComplete?: boolean };
           this.answers = { ...emptyAnswers(), ...parsed, followUpAnswers: parsed.followUpAnswers ?? {} };
           this.askedQuestionCodes = parsed.askedQuestionCodes ?? Object.keys(this.answers.followUpAnswers);
+          this.askedQuestionTitles = parsed.askedQuestionTitles ?? [];
+          this.sessionId = parsed.sessionId ?? "";
           this.collectionComplete = parsed.collectionComplete ?? false;
         } catch { localStorage.removeItem(STORAGE_KEY); }
       }
       this.hydrated = true;
     },
     persist(): void {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...this.answers, askedQuestionCodes: this.askedQuestionCodes, collectionComplete: this.collectionComplete }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...this.answers, askedQuestionCodes: this.askedQuestionCodes, askedQuestionTitles: this.askedQuestionTitles, sessionId: this.sessionId, collectionComplete: this.collectionComplete }));
     },
     async selectCrop(crop: CropId): Promise<void> {
       const changed = this.answers.crop !== crop;
       this.answers.crop = crop;
       if (changed) {
         this.answers = { ...emptyAnswers(), crop };
-        this.questions = []; this.askedQuestionCodes = []; this.currentDynamicQuestion = null;
-        this.dynamicProvider = null; this.dynamicModel = ""; this.collectionComplete = false;
+        this.questions = []; this.askedQuestionCodes = []; this.askedQuestionTitles = []; this.sessionId = ""; this.currentDynamicQuestion = null;
+        this.dynamicProvider = null; this.dynamicModel = ""; this.dynamicOrigin = null; this.collectionComplete = false;
       }
       this.persist();
       await this.loadQuestions(crop);
@@ -93,19 +100,21 @@ export const useDiagnosisStore = defineStore("diagnosis", {
     setDynamicAnswer(value: DynamicAnswer): void { this.currentDynamicAnswer = value; },
     async prepareNextDynamicQuestion(): Promise<void> {
       if (this.dynamicLoading) return;
-      if (this.followUpQuestions.length > 0 && this.askedQuestionCodes.length >= this.followUpQuestions.length) {
+      if (this.askedQuestionCodes.length >= MAX_DYNAMIC_QUESTIONS) {
         this.currentDynamicQuestion = null; this.collectionComplete = true;
-        this.dynamicReason = "Toutes les précisions agricoles disponibles ont été recueillies."; this.persist(); return;
+        this.dynamicReason = "Les précisions nécessaires ont été recueillies. L’analyse peut commencer."; this.persist(); return;
       }
       this.dynamicLoading = true; this.dynamicError = null; this.collectionComplete = false;
       try {
-        const decision = await chooseNextDiagnosisQuestion(this.answers, this.followUpQuestions, this.askedQuestionCodes);
-        this.dynamicReason = decision.reason; this.dynamicProvider = decision.provider; this.dynamicModel = decision.model;
+        const decision = await generateNextDiagnosisQuestion(this.answers, this.followUpQuestions, this.askedQuestionCodes, this.askedQuestionTitles);
+        this.dynamicReason = decision.reason; this.dynamicProvider = decision.provider; this.dynamicModel = decision.model; this.dynamicOrigin = decision.origin;
         if (decision.complete || !decision.questionCode) {
           this.currentDynamicQuestion = null; this.collectionComplete = true; this.persist(); return;
         }
-        const question = this.followUpQuestions.find((item) => item.code === decision.questionCode) ?? null;
-        if (!question) throw new Error("La question choisie est introuvable dans SQLite.");
+        const question = decision.question;
+        if (!question) throw new Error("Le moteur n’a pas fourni de question exploitable.");
+        if (!this.sessionId) this.sessionId = crypto.randomUUID();
+        await saveGeneratedQuestion(this.sessionId, question, decision);
         this.currentDynamicQuestion = question;
         this.currentDynamicAnswer = question.answerType === "multiple_choice" ? [] : "";
       } catch (error: unknown) {
@@ -119,13 +128,14 @@ export const useDiagnosisStore = defineStore("diagnosis", {
       this.answers.followUpAnswers[question.code] = this.currentDynamicAnswer;
       if (question.code === "extent" && typeof this.currentDynamicAnswer === "string") this.answers.extent = this.currentDynamicAnswer;
       if (!this.askedQuestionCodes.includes(question.code)) this.askedQuestionCodes.push(question.code);
+      if (!this.askedQuestionTitles.includes(question.titleKey)) this.askedQuestionTitles.push(question.titleKey);
       this.currentDynamicQuestion = null; this.currentDynamicAnswer = ""; this.persist();
       await this.prepareNextDynamicQuestion();
     },
     reset(): void {
       this.answers = emptyAnswers(); this.questions = []; this.questionsError = null; this.currentDynamicQuestion = null;
       this.currentDynamicAnswer = ""; this.dynamicReason = ""; this.dynamicError = null; this.dynamicProvider = null;
-      this.dynamicModel = ""; this.askedQuestionCodes = []; this.collectionComplete = false;
+      this.dynamicModel = ""; this.dynamicOrigin = null; this.askedQuestionCodes = []; this.askedQuestionTitles = []; this.sessionId = ""; this.collectionComplete = false;
       localStorage.removeItem(STORAGE_KEY);
     },
   },

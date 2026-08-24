@@ -6,8 +6,7 @@ import type { SupportedLocale } from "@/types/preferences";
 
 const AI_SERVER_URL = "http://127.0.0.1:11435";
 
-const MODEL_ID =
-  "Qwen/Qwen2.5-1.5B-Instruct-GGUF:Q4_K_M";
+const MODEL_ID = "Qwen/Qwen2.5-1.5B-Instruct-GGUF:Q4_K_M";
 
 interface AiHealthResponse {
   status?: string;
@@ -41,28 +40,19 @@ export async function checkLocalAiHealth(): Promise<void> {
   let response: Response;
 
   try {
-    response = await fetch(
-      `${AI_SERVER_URL}/health`,
-    );
+    response = await fetch(`${AI_SERVER_URL}/health`);
   } catch {
-    throw new Error(
-      "Le moteur d’intelligence artificielle local est arrêté.",
-    );
+    throw new Error("Le moteur d’intelligence artificielle local est arrêté.");
   }
 
   if (!response.ok) {
-    throw new Error(
-      "Le moteur d’intelligence artificielle ne répond pas.",
-    );
+    throw new Error("Le moteur d’intelligence artificielle ne répond pas.");
   }
 
-  const data =
-    (await response.json()) as AiHealthResponse;
+  const data = (await response.json()) as AiHealthResponse;
 
   if (data.status !== "ok") {
-    throw new Error(
-      "Le modèle d’intelligence artificielle n’est pas prêt.",
-    );
+    throw new Error("Le modèle d’intelligence artificielle n’est pas prêt.");
   }
 }
 
@@ -72,72 +62,52 @@ export async function generateAgriculturalAdvice(
   const question = request.question.trim();
 
   if (!question) {
-    throw new Error(
-      "La question agricole ne peut pas être vide.",
-    );
+    throw new Error("La question agricole ne peut pas être vide.");
   }
 
   await checkLocalAiHealth();
 
-  const guides = await findRelevantGuides(
-    question,
-    request.crop,
-  );
+  const guides = await findRelevantGuides(question, request.crop);
 
   if (guides.length === 0) {
-    throw new Error(
-      "Aucun guide agricole pertinent n’a été trouvé.",
-    );
+    throw new Error("Aucun guide agricole pertinent n’a été trouvé.");
   }
 
-  const response = await fetch(
-    `${AI_SERVER_URL}/v1/chat/completions`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: MODEL_ID,
-        temperature: 0.1,
-        max_tokens: 350,
-        stream: false,
-        messages: [
-          {
-            role: "system",
-            content: createSystemPrompt(
-              request.language,
-            ),
-          },
-          {
-            role: "user",
-            content: createUserPrompt(
-              question,
-              guides,
-            ),
-          },
-        ],
-      }),
+  const response = await fetch(`${AI_SERVER_URL}/v1/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify({
+      model: MODEL_ID,
+      temperature: 0.1,
+      max_tokens: 350,
+      stream: false,
+      messages: [
+        {
+          role: "system",
+          content: createSystemPrompt(request.language),
+        },
+        {
+          role: "user",
+          content: createUserPrompt(question, guides),
+        },
+      ],
+    }),
+  });
 
-  const data =
-    (await response.json()) as ChatCompletionResponse;
+  const data = (await response.json()) as ChatCompletionResponse;
 
   if (!response.ok) {
     throw new Error(
-      data.error?.message ??
-        "Le modèle local n’a pas pu générer de réponse.",
+      data.error?.message ?? "Le modèle local n’a pas pu générer de réponse.",
     );
   }
 
-  const answer =
-    data.choices?.[0]?.message?.content?.trim();
+  const answer = data.choices?.[0]?.message?.content?.trim();
 
   if (!answer) {
-    throw new Error(
-      "Le modèle local a retourné une réponse vide.",
-    );
+    throw new Error("Le modèle local a retourné une réponse vide.");
   }
 
   return {
@@ -147,13 +117,8 @@ export async function generateAgriculturalAdvice(
   };
 }
 
-function createSystemPrompt(
-  language: SupportedLocale,
-): string {
-  const languageInstruction: Record<
-    SupportedLocale,
-    string
-  > = {
+function createSystemPrompt(language: SupportedLocale): string {
+  const languageInstruction: Record<SupportedLocale, string> = {
     fr: "Réponds exclusivement en français simple.",
     en: "Answer exclusively in clear English.",
     pcm: "Answer only in clear Cameroon Pidgin.",
